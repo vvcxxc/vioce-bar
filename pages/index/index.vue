@@ -1,9 +1,10 @@
 <template>
-	<view class="content" id="content">
+	<view class="content" id="content" @touchend="maskTouchend">
 		<view class="box">
 			<view class="progress" id="progress">
 				<view class="green" :style="[{ height: vol+'%'}]">
-					<view class="btn" @touchstart="ChangeVolStart" @touchmove="ChangeVol"></view>
+					<view class="btn" @touchstart="ChangeVolStart" @touchmove="ChangeVol">
+					</view>
 				</view>
 			</view>
 			<view class="icon">
@@ -25,11 +26,9 @@
 				startVol: 0, //记录拖动前的数值
 				stopVol: 0, //记录按静音前的数值
 				startY: 0,
-				flag: true
+				flag: true,
+				touchNum: 0,
 			}
-		},
-		onPullDownRefresh() {
-			location.reload();
 		},
 		mounted() {
 			const query = uni.createSelectorQuery().in(this);
@@ -50,6 +49,19 @@
 			clearTimeout(this.timer);
 		},
 		methods: {
+			maskTouchend(e) {
+				console.log('lllll')
+				this.touchNum++
+				setTimeout(() => {
+					// if(this.touchNum == 1){
+					// 	console.log('单击')
+					// }
+					if (this.touchNum >= 2) {
+						location.reload();
+					}
+					this.touchNum = 0
+				}, 250)
+			},
 			changeType(close) {
 				if (close) {
 					this.stopVol = this.vol;
@@ -85,6 +97,7 @@
 				this.vol = v;
 				this.stopVol = this.vol;
 				this.setVoice(this.vol / 100) //移动时一直改变
+				uni.stopPullDownRefresh();
 			},
 			setVoice(voice) {
 				//#ifdef APP-PLUS
